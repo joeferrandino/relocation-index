@@ -236,11 +236,11 @@ details[open] .chev::after{content:'Hide'}
             <div class="refsrc"><b>Source:</b> Census Housing Vacancy Survey and CoStar/Apartment List vacancy + concession rates. Test: does a full-time entry wage (~$16&ndash;20/hr) clear the standard 3&times;-rent rule against local studio rent?</div>
             <div class="refscale"><b>Bands:</b> 9&ndash;10 = vacancy &ge;8%, widespread concessions, entry wage clears 3&times; &middot; 6&ndash;8 = balanced market, clears with a co-signer or extra deposit &middot; 3&ndash;5 = tight market, entry wage falls short &middot; 1&ndash;2 = &le;4% vacancy, broker fees, strict screening</div></div>
 
-          <div class="ref"><div class="refname">Median home price <span class="rw">1%</span> <span class="tag measured">measured</span> <span class="mono ri">s[9]</span></div>
+          <div class="ref"><div class="refname">Median home price <span class="rw">4%</span> <span class="tag measured">measured</span> <span class="mono ri">s[9]</span></div>
             <div class="refsrc"><b>Source:</b> Zillow Home Value Index, Redfin Data Center, NAR metro median sale prices.</div>
             <div class="refscale"><b>Bands:</b> 10 = &le;$300K &middot; 9 = $325K &middot; 8 = $350K &middot; 7 = $400K &middot; 6 = $450K &middot; 5 = $500K &middot; 4 = $575K &middot; 3 = $700K &middot; 2 = $950K &middot; 1 = &ge;$1.2M</div></div>
 
-          <div class="ref"><div class="refname">Family affordability <span class="rw">4%</span> <span class="tag measured">measured</span> <span class="mono ri">s[10]</span></div>
+          <div class="ref"><div class="refname">Family affordability <span class="rw">2.5%</span> <span class="tag measured">measured</span> <span class="mono ri">s[10]</span></div>
             <div class="refsrc"><b>Source:</b> median home price &divide; median household income, both metro-level, from Zillow ZHVI or Redfin over Census ACS Table B19013. This is the standard "median multiple" housing-affordability measure (Demographia / Harvard JCHS use the same construction). It asks whether a typical household on a typical income can buy a typical home, not whether a high earner can.</div>
             <div class="refscale"><b>Bands (ratio):</b> 10 = &le;2.5&times; &middot; 9 = 3.0&times; &middot; 8 = 3.5&times; &middot; 7 = 4.0&times; &middot; 6 = 4.5&times; &middot; 5 = 5.0&times; &middot; 4 = 5.5&times; &middot; 3 = 6.5&times; &middot; 2 = 8.0&times; &middot; 1 = &gt;8.0&times;<br><b>Convention:</b> under 3.0&times; is broadly considered affordable, 3&ndash;4&times; moderately unaffordable, 4&ndash;5&times; seriously unaffordable, over 5&times; severely unaffordable.</div></div>
         </div>
@@ -318,8 +318,8 @@ const FACTORS = [
  {si:0, key:'upside', label:'Economic upside',       sub:'',            def:15,   kind:'score'},
  {si:4, key:'rent',   label:'1BR rent',              sub:'$/mo',        def:12,  kind:'rent'},
  {si:3, key:'approve',label:'Lease approval',        sub:'',            def:5.6,  kind:'score'},
- {si:9, key:'home',   label:'Median home price',     sub:'',            def:1,   kind:'home'},
- {si:10,key:'famaff', label:'Family affordability',  sub:'price / income', def:4, kind:'famaff'},
+ {si:9, key:'home',   label:'Median home price',     sub:'',            def:4,   kind:'home'},
+ {si:10,key:'famaff', label:'Family affordability',  sub:'price / income', def:2.5, kind:'famaff'},
  {si:7, key:'lifestyle',label:'Lifestyle',           sub:'',            def:15,  kind:'score'},
  {si:5, key:'tax',    label:'Tax Savings',           sub:'',            def:4,   kind:'score'},
  {si:8, key:'crime',  label:'Crime',                 sub:'',            def:9.7,   kind:'score', invert:true},
@@ -332,7 +332,7 @@ const PRESET_NOTES = {
  "Bright Lights":"Career and lifestyle only.",
 };
 const PRESETS = {
- "Best Value": {entry:13, market:15, upside:15, rent:12, approve:5.6, home:1, famaff:4, crime:9.7, tax:4, climate:5.2, lifestyle:15},
+ "Best Value": {entry:13, market:15, upside:15, rent:12, approve:5.6, home:4, famaff:2.5, crime:9.7, tax:4, climate:5.2, lifestyle:15},
  "Family Life": {entry:5, market:15, upside:15, rent:9, approve:4, home:3, famaff:15, crime:13, tax:5, climate:8, lifestyle:8},
  "Bright Lights": {entry:0, market:30, upside:30, rent:0, approve:0, home:0, famaff:0, crime:0, tax:0, climate:0, lifestyle:40},
 };
