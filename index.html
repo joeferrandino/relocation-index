@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Relocation Index: where to move, weighted your way</title>
+<meta name="description" content="Twenty-three US metros scored on rent, jobs, crime, climate risk and affordability. Set your own weights and the ranking re-sorts live. Every source shown.">
+<meta name="theme-color" content="#14181f">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Relocation Index">
+<meta property="og:description" content="Twenty-three US metros scored for arriving with nothing and building a life. Drag any weight, the ranking re-sorts live.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314181f'/%3E%3Crect x='6' y='18' width='4' height='8' fill='%23b23b3b'/%3E%3Crect x='12.5' y='13' width='4' height='13' fill='%23b7791f'/%3E%3Crect x='19' y='8' width='4' height='18' fill='%232e7d54'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14181f; --paper:#faf8f4; --band:#f1ede6; --line:#ddd7cc; --mute:#6b7280;
+  --teal:#157a6e; --teal-soft:#dcece9;
+  --green:#2e7d54; --amber:#b7791f; --red:#b23b3b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Space Grotesk",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; line-height:1.45;
+}
+.mono{font-family:"IBM Plex Mono",monospace}
+header.top{background:var(--ink); color:var(--paper); padding:15px clamp(14px,3vw,32px) 14px}
+header.top h1{font-size:22px; font-weight:700; letter-spacing:-.02em; margin:0}
+header.top .eyebrow{font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#b8bcc4; margin-bottom:7px}
+header.top p{margin:6px 0 0; font-size:12.5px; line-height:1.4; color:#cfd2d8; max-width:78ch}
+.wrap{max-width:1560px; margin:0 auto; padding:14px clamp(14px,3vw,32px) 32px}
+.layout{display:grid; grid-template-columns:1fr; gap:20px}
+@media(min-width:1040px){
+  .layout{grid-template-columns:1fr 320px; align-items:start}
+  .panel{grid-column:1; grid-row:1}
+  .console{grid-column:2; grid-row:1}
+}
+@media(min-width:1500px){ .layout{grid-template-columns:1fr 350px} }
+
+/* ---- console ---- */
+.console{background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px 14px 4px}
+.console h2{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--mute); margin:2px 0 12px; font-weight:600}
+.presets{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px}
+.presets button{
+  font-family:inherit; font-size:11.5px; font-weight:600; letter-spacing:.01em;
+  padding:6px 10px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+  border-radius:20px; cursor:pointer; transition:.15s;
+}
+.presets button:hover{border-color:var(--teal); color:var(--teal)}
+.pnote{font-size:11.5px; line-height:1.45; color:var(--mute); margin:-8px 0 14px; min-height:32px}
+.presets button.active{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.lever{padding:6px 0; border-top:1px solid #f0ece4}
+.lever:first-of-type{border-top:none}
+.lever .lrow{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.lever .lname{font-size:13.5px; font-weight:500}
+.lever .lwt{font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:600; color:var(--teal); font-variant-numeric:tabular-nums}
+.lever input[type=range]{width:100%; margin:7px 0 0; -webkit-appearance:none; appearance:none; height:5px; border-radius:5px; background:var(--band); outline:none}
+.lever input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%; background:var(--teal); border:3px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.28); cursor:pointer}
+.lever input[type=range]::-moz-range-thumb{width:18px; height:18px; border:3px solid #fff; border-radius:50%; background:var(--teal); box-shadow:0 1px 3px rgba(0,0,0,.28); cursor:pointer}
+.lever input[type=range]:focus-visible{box-shadow:0 0 0 3px var(--teal-soft)}
+.summ{display:flex; justify-content:space-between; align-items:center; padding:12px 2px 8px; margin-top:6px; border-top:1px solid #f0ece4; font-size:11.5px; color:var(--mute)}
+
+/* ---- table ---- */
+.panel{background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden}
+.panel .bar{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.panel .bar h2{margin:0; font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); font-weight:600}
+.scrollwrap{position:relative}
+.scrollwrap::after{content:''; position:absolute; top:0; right:0; bottom:0; width:34px; pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(20,24,31,.09)); opacity:0; transition:opacity .2s}
+.scrollwrap.more::after{opacity:1}
+.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.scrollhint{font-size:11px; color:var(--mute); padding:8px 14px 0}
+@media(min-width:1200px){ .scrollhint{display:none} }
+table{border-collapse:separate; border-spacing:0; width:100%; font-size:12.5px; table-layout:auto}
+thead th{background:var(--ink); color:var(--paper); font-weight:600; font-size:9.5px; letter-spacing:.01em; text-transform:uppercase; padding:7px 5px; text-align:center; vertical-align:middle; white-space:normal; line-height:1.18; hyphens:auto; position:sticky; top:0; z-index:3}
+thead th .sub{display:block; font-size:8.5px; line-height:1.15; margin-top:1px; color:#aab0b8; font-weight:500; letter-spacing:.02em}
+tbody td{padding:6px 5px; text-align:center; border-bottom:1px solid #f1ede4; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+th.rank,td.rank{width:30px; padding-left:9px; left:0; position:sticky; z-index:2; background:inherit}
+th.city,td.city{text-align:left; position:sticky; left:30px; z-index:2; background:inherit; font-family:"Space Grotesk",sans-serif; font-weight:600; min-width:126px; white-space:nowrap}
+thead th.rank,thead th.city{background:var(--ink); z-index:4}
+tbody tr{background:#fff}
+tbody tr:nth-child(even){background:var(--band)}
+td.rank{color:var(--mute); font-weight:600}
+td.city{font-size:12.5px}
+td.score{font-weight:700; color:#fff; border-radius:0}
+td.score .chip{display:inline-block; min-width:44px; padding:3px 7px; border-radius:6px; font-size:13px}
+.dem{display:table-cell}
+th.dem{background:#26303a !important}
+td.demcell{color:var(--mute); font-size:12px}
+.sub2{display:block; font-size:9.5px; color:var(--mute); font-weight:400; margin-top:1px}
+.demstart{border-left:2px solid var(--line) !important}
+.foot{padding:12px 14px; font-size:11px; color:var(--mute); line-height:1.5; border-top:1px solid var(--line)}
+.foot b{color:var(--ink)}
+.demnote{font-size:11px; color:var(--mute); padding:2px 2px 10px}
+a.reset{font-size:11px}
+.pdfbtn{font-family:inherit; font-size:12px; font-weight:600; padding:7px 14px; border:1px solid rgba(250,248,244,.35); background:transparent; color:var(--paper); border-radius:20px; cursor:pointer; transition:.15s; margin-top:10px}
+.pdfbtn:hover{background:var(--paper); color:var(--ink); border-color:var(--paper)}
+.meth{margin-top:20px; padding:0}
+.meth summary.mhead{background:var(--ink); color:var(--paper); padding:12px 16px; cursor:pointer; list-style:none;
+  display:flex; align-items:center; justify-content:space-between; gap:14px}
+.meth summary.mhead::-webkit-details-marker{display:none}
+.meth summary.mhead:hover .chev{background:var(--paper); color:var(--ink)}
+.chev{flex:none; font-size:11px; font-weight:600; border:1px solid rgba(250,248,244,.4); border-radius:20px;
+  padding:4px 12px; transition:.15s}
+.chev::after{content:'Show'}
+details[open] .chev::after{content:'Hide'}
+.meth .mhead .eyebrow{font-size:10.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:#b8bcc4}
+.meth .mhead h2{margin:4px 0 0; font-size:17px; font-weight:700; letter-spacing:-.01em}
+.meth .mbody{padding:16px}
+.meth .mgrid{display:grid; grid-template-columns:1fr; gap:18px}
+@media(min-width:760px){ .meth .mgrid{grid-template-columns:1fr 1fr; gap:26px} }
+.meth h3{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mute); margin:0 0 8px; font-weight:600}
+.meth p.d{font-size:12.5px; line-height:1.5; margin:0 0 9px}
+.meth p.d b{color:var(--ink)}
+.ref{padding:11px 0; border-top:1px solid #f0ece4}
+.ref:first-child{border-top:none; padding-top:0}
+.refname{font-size:13.5px; font-weight:600; margin-bottom:5px; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap}
+.refname .rw{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600; color:var(--teal); background:var(--teal-soft); padding:1px 6px; border-radius:10px}
+.refname .tag{font-size:9px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:1px 5px; border-radius:9px; border:1px solid var(--line); color:var(--mute)}
+.refname .tag.measured{color:var(--teal); border-color:var(--teal-soft); background:var(--teal-soft)}
+.refname .ri{font-size:10px; color:var(--mute)}
+.refsrc{font-size:11.8px; line-height:1.5; color:#3b4048; margin-bottom:4px}
+.refscale{font-size:11.8px; line-height:1.5; color:#3b4048; background:var(--paper); border-left:2px solid var(--line); padding:6px 9px; border-radius:0 5px 5px 0}
+.refsrc b,.refscale b{color:var(--ink)}
+.meth .src{font-size:11px; color:var(--mute); line-height:1.55; margin-top:14px; padding-top:12px; border-top:1px solid var(--line)}
+.printonly{display:none}
+.printhead .pt{font-family:"Space Grotesk",sans-serif; font-weight:700; font-size:18px}
+.printhead .pw{font-size:9px; color:#444; margin-top:3px; line-height:1.4}
+
+@media print{
+  @page{ size:landscape; margin:10mm }
+  .console,.presets,.toggle,.pdfbtn,.pnote{ display:none !important }
+  header.top{ background:#fff !important; color:#000 !important; padding:0 0 10px; border-bottom:2px solid #000; margin-bottom:10px }
+  header.top .eyebrow{ color:#444 !important }
+  header.top p{ color:#000 !important; font-size:9.5px; line-height:1.45; max-width:none }
+  header.top h1{ font-size:20px }
+  .printonly{ display:block !important }
+  body{ background:#fff }
+  .wrap{ max-width:none; padding:0 }
+  .layout{ display:block }
+  .panel{ border:none; border-radius:0 }
+  .panel .bar{ border:none; padding:0 0 6px }
+  .printhead{ margin-bottom:6px }
+  .scroll{ overflow:visible }
+  table{ font-size:8.5px }
+  th.rank,td.rank,th.city,td.city{ position:static }
+  thead th,td.score .chip,tbody tr:nth-child(even){ -webkit-print-color-adjust:exact; print-color-adjust:exact }
+  tbody tr{ break-inside:avoid }
+  .meth{ break-before:page }
+  .meth .mhead,.meth .mgrid{ break-inside:avoid }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="eyebrow">Interactive &middot; 23 US metros &middot; 2026 data</div>
+  <h1>The Relocation Index</h1>
+  <p>Twenty-three metros scored for arriving with nothing and getting to the basics of a life: a roof of your own, a social life, and real opportunity to build on. Drag any weight and the ranking re-sorts live. Weights don't need to add to 100. Each lever's share is normalized, shown as its effective %. Age, income and race columns are census reference only and never affect the score.</p>
+  <button class="pdfbtn" id="pdfBtn">Save as PDF</button>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <!-- CONSOLE -->
+    <section class="console" aria-label="Weight controls">
+      <h2>Weightings</h2>
+      <div class="presets" id="presets"></div>
+      <div class="pnote" id="pnote"></div>
+      <div id="levers"></div>
+      <div class="summ">
+        <span>Effective weights shown live</span>
+        <a class="reset mono" href="#" id="resetLink" style="color:var(--teal);font-weight:600;text-decoration:none">Reset weights</a>
+      </div>
+    </section>
+
+    <!-- TABLE -->
+    <section class="panel" aria-label="Ranking">
+      <div class="printonly printhead"><div class="pw" id="printWeights"></div></div>
+      <div class="bar">
+        <h2>Live ranking</h2>
+      </div>
+      <div class="scrollwrap" id="scrollwrap">
+        <div class="scrollhint">Scroll the table sideways to see every column. Rank and metro stay pinned.</div>
+        <div class="scroll" id="scroller">
+        <table>
+          <thead><tr id="head"></tr></thead>
+          <tbody id="body"></tbody>
+        </table>
+        </div>
+      </div>
+      <div class="foot" id="sitefoot">
+        <b>Reading it.</b> Every factor is rated 1–10 (higher is better for someone starting from near-zero); Studio rent and Median home price show the actual dollar figure the rating reflects. The Overall score is the weighted average across your lever settings.
+        <b>Sources:</b> Crime is rated 1&ndash;10 (10 = worst) from total index crime, violent + property, per 100,000, from the FBI Crime Data Explorer; rents, home prices, taxes and demographics come from public datasets; the remaining 1&ndash;10 ratings are calibrated judgment. Every column's source and scoring bands are listed in the reference section below. A decision aid, not a verdict.
+      </div>
+    </section>
+  </div>
+
+  <section class="panel meth" aria-label="Sources and methodology">
+    <details id="refdet" open>
+    <summary class="mhead">
+      <div>
+        <div class="eyebrow">Reference &middot; sources &amp; scoring</div>
+        <h2>Where every number comes from and how it's scored</h2>
+      </div>
+      <span class="chev"></span>
+    </summary>
+    <div class="mbody">
+      <p class="d" style="margin-bottom:4px"><b>How the overall score works.</b> Every column is converted to a 1&ndash;10 rating where <b>higher is always better for someone arriving with little</b>. The overall score is the weighted average: <span class="mono">score = &Sigma;(rating &times; weight) &divide; &Sigma;(weights)</span>. Weights don't need to total 100; they're normalized.</p>
+      <p class="d" style="margin-bottom:18px"><b>To edit this file.</b> Each city's ratings live in the <span class="mono">CITIES</span> array as <span class="mono">s:[...]</span>, indexed <span class="mono">[0 upside, 1 market, 2 entry, 3 approve, 4 rent, 5 tax, 6 climate, 7 lifestyle, 8 crime, 9 homePrice]</span>. Dollar and rate values are separate fields (<span class="mono">rent</span>, <span class="mono">home</span>, <span class="mono">crime</span>, <span class="mono">dem</span>). Default weights are in <span class="mono">FACTORS[].def</span>.</p>
+
+      <div class="mgrid">
+        <div>
+          <div class="ref"><div class="refname">Entry-level jobs <span class="rw">13%</span> <span class="tag rated">rated</span> <span class="mono ri">s[2]</span></div>
+            <div class="refsrc"><b>Source:</b> BLS Local Area Unemployment Statistics (metro unemployment rate) plus volume of retail/food/warehouse postings on Indeed or Lightcast. Lower unemployment + high posting volume = easier to get hired fast.</div>
+            <div class="refscale"><b>Bands:</b> 9&ndash;10 = unemployment &le;3.5% with heavy service/logistics hiring &middot; 7&ndash;8 = 3.5&ndash;4.5%, steady hiring &middot; 5&ndash;6 = 4.5&ndash;5.5% &middot; 3&ndash;4 = &ge;5.5% or a saturated entry market</div></div>
+
+          <div class="ref"><div class="refname">Degree-level jobs <span class="rw">15%</span> <span class="tag rated">rated</span> <span class="mono ri">s[1]</span></div>
+            <div class="refsrc"><b>Source:</b> BLS Current Employment Statistics by metro; Lightcast/LinkedIn counts of postings requiring a bachelor's degree; metro job-growth rate.</div>
+            <div class="refscale"><b>Bands:</b> 10 = very large, growing degree-level market &middot; 8 = large and stable &middot; 6 = mid-size, modest growth &middot; 4 = thin or shrinking</div></div>
+
+          <div class="ref"><div class="refname">Economic upside <span class="rw">15%</span> <span class="tag rated">rated</span> <span class="mono ri">s[0]</span></div>
+            <div class="refsrc"><b>Source:</b> a 60/40 blend. <b>Existing ceiling (60%)</b>: Fortune 500 HQ count by metro and BLS OES 90th-percentile wage for management and professional occupations. <b>Business dynamism (40%)</b>: whether companies are arriving or leaving: CBRE headquarters-relocation tracking (725 HQ moves nationally 2018&ndash;2025), Census Business Formation Statistics for new-business applications, Census/BLS business dynamics for establishment births vs. deaths, Tax Foundation State Business Tax Climate Index, and Site Selection Magazine's corporate facility-project counts.</div>
+            <div class="refscale"><b>Ceiling bands:</b> 10 = &ge;8 major HQs or 90th-pct wage &ge;$180K &middot; 8&ndash;9 = 4&ndash;7 HQs / ~$150K &middot; 6&ndash;7 = 1&ndash;3 HQs / ~$130K &middot; &le;5 = no major HQs / &le;$115K.<br><b>Dynamism bands:</b> 10 = strong net HQ inflow and high business formation (Dallas-Fort Worth gained 111 relocations 2018&ndash;2025, Austin 88) &middot; 7&ndash;9 = net gainer (FL, NC, TN, AZ, GA, CO) &middot; 5&ndash;6 = mixed, losing HQs but still winning facility projects (Chicago) &middot; &le;4 = sustained net outflow (Bay Area &minus;156 HQs 2018&ndash;2024; NYC metro second-highest departures).</div></div>
+
+          <div class="ref"><div class="refname">1BR rent <span class="rw">12%</span> <span class="tag measured">measured</span> <span class="mono ri">s[4]</span></div>
+            <div class="refsrc"><b>Source:</b> RentCafe, Zumper National Rent Report, Apartment List, metro average <b>one-bedroom</b> rent, mid-2026. 1BR is the scored figure because studios are scarce outside dense pre-war cores; most Sun Belt inventory is 1BR/2BR garden-style. The studio average is shown beneath each 1BR figure as unscored reference.</div>
+            <div class="refscale"><b>Bands (1BR):</b> 10 = &le;$1,150 &middot; 9 = $1,300 &middot; 8 = $1,400 &middot; 7 = $1,500 &middot; 6 = $1,650 &middot; 5 = $1,800 &middot; 4 = $2,000 &middot; 3 = $2,300 &middot; 2 = $2,700 &middot; 1 = &ge;$3,200</div></div>
+
+          <div class="ref"><div class="refname">Lease approval <span class="rw">5.7%</span> <span class="tag rated">rated</span> <span class="mono ri">s[3]</span></div>
+            <div class="refsrc"><b>Source:</b> Census Housing Vacancy Survey and CoStar/Apartment List vacancy + concession rates. Test: does a full-time entry wage (~$16&ndash;20/hr) clear the standard 3&times;-rent rule against local studio rent?</div>
+            <div class="refscale"><b>Bands:</b> 9&ndash;10 = vacancy &ge;8%, widespread concessions, entry wage clears 3&times; &middot; 6&ndash;8 = balanced market, clears with a co-signer or extra deposit &middot; 3&ndash;5 = tight market, entry wage falls short &middot; 1&ndash;2 = &le;4% vacancy, broker fees, strict screening</div></div>
+
+          <div class="ref"><div class="refname">Median home price <span class="rw">1%</span> <span class="tag measured">measured</span> <span class="mono ri">s[9]</span></div>
+            <div class="refsrc"><b>Source:</b> Zillow Home Value Index, Redfin Data Center, NAR metro median sale prices.</div>
+            <div class="refscale"><b>Bands:</b> 10 = &le;$300K &middot; 9 = $325K &middot; 8 = $350K &middot; 7 = $400K &middot; 6 = $450K &middot; 5 = $500K &middot; 4 = $575K &middot; 3 = $700K &middot; 2 = $950K &middot; 1 = &ge;$1.2M</div></div>
+
+          <div class="ref"><div class="refname">Family affordability <span class="rw">4%</span> <span class="tag measured">measured</span> <span class="mono ri">s[10]</span></div>
+            <div class="refsrc"><b>Source:</b> median home price &divide; median household income, both metro-level, from Zillow ZHVI or Redfin over Census ACS Table B19013. This is the standard "median multiple" housing-affordability measure (Demographia / Harvard JCHS use the same construction). It asks whether a typical household on a typical income can buy a typical home, not whether a high earner can.</div>
+            <div class="refscale"><b>Bands (ratio):</b> 10 = &le;2.5&times; &middot; 9 = 3.0&times; &middot; 8 = 3.5&times; &middot; 7 = 4.0&times; &middot; 6 = 4.5&times; &middot; 5 = 5.0&times; &middot; 4 = 5.5&times; &middot; 3 = 6.5&times; &middot; 2 = 8.0&times; &middot; 1 = &gt;8.0&times;<br><b>Convention:</b> under 3.0&times; is broadly considered affordable, 3&ndash;4&times; moderately unaffordable, 4&ndash;5&times; seriously unaffordable, over 5&times; severely unaffordable.</div></div>
+        </div>
+
+        <div>
+          <div class="ref"><div class="refname">Lifestyle <span class="rw">15%</span> <span class="tag rated">rated</span> <span class="mono ri">s[7]</span></div>
+            <div class="refsrc"><b>Source:</b> a 60/40 blend of two things. <b>Social scene (60%)</b>: venues and restaurants per capita, share of residents aged 25&ndash;34 (Census ACS), net in-migration of young adults. <b>Natural amenities (40%)</b>: access to beaches, lakes, hiking, mountains and scenery, benchmarked against the USDA ERS Natural Amenities Scale and drive time to coast, water and trailheads.</div>
+            <div class="refscale"><b>Scene bands:</b> 10 = major cultural hub &middot; 8&ndash;9 = strong scene, young and growing &middot; 5&ndash;6 = decent but quiet &middot; &le;4 = limited or commuter-suburb feel.<br><b>Nature bands:</b> 10 = beaches and mountains both within reach (LA, Denver) &middot; 7&ndash;8 = one outstanding asset nearby (Gulf beaches, Blue Ridge) &middot; 5 = modest, a couple of hours to anything &middot; &le;3 = flat and landlocked.</div></div>
+
+          <div class="ref"><div class="refname">Tax Savings <span class="rw">4%</span> <span class="tag measured">measured</span> <span class="mono ri">s[5]</span></div>
+            <div class="refsrc"><b>Source:</b> Tax Foundation State Individual Income Tax Rates; state revenue departments. Include local earnings taxes (e.g. Kansas City's 1%).</div>
+            <div class="refscale"><b>Bands:</b> 10 = no state income tax (FL, TX, TN) &middot; 8 = flat &le;3% &middot; 6 = 4&ndash;5.5% top rate &middot; 4 = 5.5&ndash;7%, or lower rate plus local earnings tax &middot; 3 = ~5% plus heavy local/property burden &middot; 2 = progressive top rate &ge;6.5% (CA, NY, NJ)</div></div>
+
+          <div class="ref"><div class="refname">Crime <span class="rw">9.7%</span> <span class="tag measured">measured</span> <span class="mono ri">s[8]</span></div>
+            <div class="refsrc"><b>Source:</b> FBI Crime Data Explorer (cde.ucr.cjis.gov), agency/metro NIBRS. Use <b>total index crime = violent + property</b> per 100,000, not violent alone. <b>This column is inverted, like Climate Risk:</b> a higher crime rate produces a higher number, so 10 = worst. It is subtracted in the overall score, not added. Cross-check with local PD annual reports; NIBRS coverage is uneven and some agencies under-report.</div>
+            <div class="refscale"><b>Bands (higher crime rate = higher score), total per 100k:</b> 1 = &le;1,500 &middot; 2 = 1,800 &middot; 3 = 2,300 &middot; 4 = 2,600 &middot; 5 = 3,000 &middot; 6 = 3,600 &middot; 7 = 4,300 &middot; 8 = 5,200 &middot; 9 = 6,200 &middot; 10 = &ge;7,000<br><b>Note:</b> the table displays the 1&ndash;10 rating; the underlying rate per 100k is kept in each city's <span class="mono">crime</span> field for reference. Property crime dominates the total, so cities with low violence but heavy theft (San Francisco) rate low here, which is intended.</div></div>
+
+          <div class="ref"><div class="refname">Climate Risk <span class="rw">5.4%</span> <span class="tag rated">rated</span> <span class="mono ri">s[6]</span></div>
+            <div class="refsrc"><b>Source:</b> FEMA National Risk Index expected annual loss by county; NOAA billion-dollar disaster records; state insurance-department nonrenewal rates and average homeowner premiums; NOAA climate normals for heat and cold mortality; Colorado River and Great Lakes water reporting. <b>Measures risk to property and person, not comfort.</b> Insurance pricing is the sharpest available signal: Florida homeowners now pay roughly $7,100&ndash;$15,000 a year against a $2,500&ndash;$3,500 national average, Florida nonrenewals reached ~3% statewide and parts of California ~8%.</div>
+            <div class="refscale"><b>Formula:</b> <span class="mono">0.50 &times; property-damage risk + 0.30 &times; personal danger + 0.20 &times; long-term vulnerability</span>, rounded. <b>This column is inverted: 10 = worst risk.</b> All three sub-scores point the same way, so a higher number is always more exposure. It is subtracted in the overall score, not added.<br><b>Property damage (1&ndash;10):</b> hurricane, surge, flood, wildfire, tornado, hail and quake exposure, weighted by insurance cost and availability. 10 = severe hazard with insurers withdrawing &middot; 1 = low hazard, normal premiums.<br><b>Personal danger (1&ndash;10):</b> deaths and injury from extreme heat, extreme cold and storms. Phoenix rates high here despite moderate property risk; Maricopa County records hundreds of heat deaths annually.<br><b>Long-term vulnerability (1&ndash;10):</b> water insecurity, sea-level rise and worsening hazard trend. Stated as vulnerability rather than resilience so it runs the same direction as the other two.</div></div>
+
+          <div class="ref"><div class="refname">Age groups <span class="rw">reference only</span> <span class="tag reference">reference</span> <span class="mono ri">age[]</span></div>
+            <div class="refsrc"><b>Source:</b> U.S. Census Bureau ACS Table B01001 (Sex by Age), metro/MSA level. Shown as share of total population aged 18&ndash;34, 35&ndash;64 and 65+; under-18 is omitted, so the three columns don't total 100%.</div>
+            <div class="refscale"><b>Not scored.</b> Useful as a peer-group and life-stage signal. A high 18&ndash;34 share means more people your age; a high 65+ share signals a retirement-skewed metro.</div></div>
+
+          <div class="ref"><div class="refname">Median household income <span class="rw">reference only</span> <span class="tag reference">reference</span> <span class="mono ri">inc</span></div>
+            <div class="refsrc"><b>Source:</b> U.S. Census Bureau ACS Table B19013 (Median Household Income in the Past 12 Months), metro/MSA level.</div>
+            <div class="refscale"><b>Not scored.</b> Read it against Studio rent, not on its own. A high median income often means a high cost floor, and it describes established households, not what you'd earn on arrival.</div></div>
+
+          <div class="ref"><div class="refname">Race &amp; ethnicity <span class="rw">reference only</span> <span class="tag reference">reference</span> <span class="mono ri">dem[]</span></div>
+            <div class="refsrc"><b>Source:</b> U.S. Census Bureau ACS Table B03002 (Hispanic or Latino Origin by Race), metro/MSA level; 2020 Census for baseline.</div>
+            <div class="refscale"><b>Not scored.</b> Rounded, and other/multiracial residents aren't shown, so rows need not total 100%. Metro-wide shares also hide large neighborhood-level variation.</div></div>
+        </div>
+      </div>
+
+      <p class="src"><b>Primary sources.</b> FBI Crime Data Explorer (cde.ucr.cjis.gov); U.S. Census Bureau (2020 Census, ACS B03002, Housing Vacancy Survey); U.S. Bureau of Labor Statistics (OES wages, CES metro employment, LAUS unemployment); Zillow ZHVI and Redfin Data Center; RentCafe, Zumper, Apartment List; Tax Foundation and state revenue departments; NOAA climate normals; FEMA National Risk Index; USDA cropland data; Fortune 500 HQ listings; Lightcast job-posting data.</p>
+      <p class="src"><b>Honesty note.</b> Dollar figures, tax rates and demographics come from the datasets above. The 1&ndash;10 ratings are calibrated to the bands listed but were assigned by judgment, not computed row-by-row from a live dataset, so any single rating can be wrong. The bands are published here precisely so a rating can be checked against the source and corrected. Where a number conflicts with what you've seen on the ground, trust your eyes and change it.</p>
+    </div>
+    </details>
+  </section>
+</div>
+
+<script>
+const CITIES = [
+ // s = [0 upside, 1 market, 2 entry, 3 approve, 4 rent, 5 tax, 6 climate, 7 lifestyle, 8 crime, 9 homePrice, 10 famAfford]
+ {n:"Austin, TX",          s:[9,9,8,8,7,10,6,8,5,6,5],  rent:1450, studio:1350, home:450000, crime:3700, age:[26,38,12], inc:95000, dem:[50,32,7,7]},
+ {n:"Dallas, TX",          s:[9,9,9,8,8,10,7,4,7,7,5],  rent:1400, studio:1300, home:400000, crime:4300, age:[24,38,13], inc:85000, dem:[44,29,16,8]},
+ {n:"Tampa, FL",           s:[8,7,8,9,6,10,9,7,5,7,4],  rent:1700, studio:1550, home:390000, crime:3050, age:[21,38,21], inc:72000, dem:[55,22,12,4]},
+ {n:"Atlanta, GA",         s:[9,9,8,6,6,6,4,8,8,7,5],   rent:1650, studio:1550, home:400000, crime:5200, age:[23,40,14], inc:85000, dem:[39,13,36,8]},
+ {n:"Jacksonville, FL",    s:[7,6,8,9,8,10,7,5,6,9,5],  rent:1350, studio:1200, home:340000, crime:3550, age:[22,38,17], inc:74000, dem:[55,11,22,5]},
+ {n:"Nashville, TN",       s:[8,7,7,6,6,10,5,8,7,6,4],  rent:1600, studio:1500, home:440000, crime:4300, age:[24,39,15], inc:80000, dem:[64,10,15,4]},
+ {n:"Charlotte, NC",       s:[9,8,7,8,7,6,4,5,6,7,5],   rent:1500, studio:1350, home:390000, crime:3700, age:[23,39,15], inc:81000, dem:[54,12,22,6]},
+ {n:"Phoenix, AZ",         s:[7,7,9,7,8,8,7,6,6,6,4],   rent:1400, studio:1300, home:450000, crime:3600, age:[23,37,17], inc:82000, dem:[42,31,6,4]},
+ {n:"Raleigh, NC",         s:[8,9,6,6,7,6,4,5,3,6,6],   rent:1450, studio:1300, home:410000, crime:2300, age:[23,39,14], inc:95000, dem:[57,11,19,7]},
+ {n:"West Palm Beach, FL", s:[9,6,7,3,4,10,8,7,6,5,2],  rent:2100, studio:1900, home:500000, crime:3500, age:[19,37,25], inc:75000, dem:[53,23,19,3]},
+ {n:"Denver, CO",          s:[8,8,6,6,5,3,6,9,7,4,3],   rent:1750, studio:1600, home:580000, crime:4400, age:[24,39,14], inc:100000, dem:[54,24,6,5]},
+ {n:"Boston, MA",          s:[8,9,5,2,2,4,4,8,4,3,3],  rent:2900, studio:2350, home:700000, crime:2400, age:[24,39,17], inc:110000, dem:[63,12,9,9]},
+ {n:"Los Angeles, CA",     s:[7,8,6,3,3,2,8,10,6,2,1],  rent:2300, studio:1850, home:950000, crime:3400, age:[24,39,15], inc:88000, dem:[26,45,7,15]},
+ {n:"San Francisco, CA",   s:[8,8,4,2,1,2,6,8,8,1,1],  rent:3200, studio:2500, home:1300000, crime:5300, age:[24,40,17], inc:130000, dem:[38,22,7,26]},
+ {n:"Hartford, CT",        s:[5,7,6,5,7,3,4,4,6,9,7],   rent:1450, studio:1150, home:320000, crime:3300, age:[21,39,18], inc:90000, dem:[57,18,11,5]},
+ {n:"Chicago, IL",         s:[7,8,7,6,5,3,3,7,7,9,7],   rent:1900, studio:1600, home:340000, crime:4300, age:[23,39,16], inc:85000, dem:[50,22,16,7]},
+ {n:"New York City, NY",  s:[8,10,7,1,1,1,5,8,3,3,1], rent:4000, studio:3000, home:780000, crime:2100, age:[25,40,16], inc:95000, dem:[32,28,20,15]},
+ {n:"Stamford, CT",       s:[7,6,6,4,2,2,4,6,2,3,3],    rent:2500, studio:2100, home:650000, crime:1500, age:[22,40,17], inc:105000, dem:[45,30,13,9]},
+ {n:"Albany, NY",         s:[5,6,7,7,8,3,3,6,4,9,7],   rent:1400, studio:1150, home:310000, crime:2600, age:[23,39,18], inc:80000, dem:[74,8,10,5]},
+ {n:"Danbury, CT",        s:[6,5,6,5,5,2,3,5,2,6,5],   rent:1900, studio:1600, home:450000, crime:1700, age:[22,40,17], inc:95000, dem:[50,30,8,7]},
+ {n:"Manchester, NH",     s:[7,6,8,4,5,10,3,6,3,5,5],  rent:1800, studio:1500, home:500000, crime:2200, age:[22,40,18], inc:105000, dem:[83,8,3,4]},
+ {n:"Sarasota, FL",       s:[6,5,9,6,5,10,9,6,4,6,3],  rent:1800, studio:1600, home:460000, crime:2600, age:[16,34,34], inc:75000, dem:[74,14,5,2]},
+ {n:"Kansas City, MO",     s:[6,7,8,8,10,4,5,5,8,10,7],  rent:1150, studio:1000, home:300000, crime:5500, age:[22,39,16], inc:80000, dem:[67,10,12,3]},
+];
+
+// factor: si = index into s[]; key; label; default weight; kind
+const FACTORS = [
+ {si:2, key:'entry',  label:'Entry-level jobs',      sub:'',            def:13,  kind:'score'},
+ {si:1, key:'market', label:'Degree-level jobs',     sub:'',            def:15,  kind:'score'},
+ {si:0, key:'upside', label:'Economic upside',       sub:'',            def:15,   kind:'score'},
+ {si:4, key:'rent',   label:'1BR rent',              sub:'$/mo',        def:12,  kind:'rent'},
+ {si:3, key:'approve',label:'Lease approval',        sub:'',            def:5.6,  kind:'score'},
+ {si:9, key:'home',   label:'Median home price',     sub:'',            def:1,   kind:'home'},
+ {si:10,key:'famaff', label:'Family affordability',  sub:'price / income', def:4, kind:'famaff'},
+ {si:7, key:'lifestyle',label:'Lifestyle',           sub:'',            def:15,  kind:'score'},
+ {si:5, key:'tax',    label:'Tax Savings',           sub:'',            def:4,   kind:'score'},
+ {si:8, key:'crime',  label:'Crime',                 sub:'',            def:9.7,   kind:'score', invert:true},
+ {si:6, key:'climate',label:'Climate Risk',          sub:'',            def:5.2,   kind:'score', invert:true},
+];
+
+const PRESET_NOTES = {
+ "Best Value":"Arrive with little, get established fast, and still have room to climb in a place worth being.",
+ "Family Life":"Can a middle-class family thrive here, afford a home, and earn enough to support it.",
+ "Bright Lights":"Career and lifestyle only.",
+};
+const PRESETS = {
+ "Best Value": {entry:13, market:15, upside:15, rent:12, approve:5.6, home:1, famaff:4, crime:9.7, tax:4, climate:5.2, lifestyle:15},
+ "Family Life": {entry:5, market:15, upside:15, rent:9, approve:4, home:3, famaff:15, crime:13, tax:5, climate:8, lifestyle:8},
+ "Bright Lights": {entry:0, market:30, upside:30, rent:0, approve:0, home:0, famaff:0, crime:0, tax:0, climate:0, lifestyle:40},
+};
+
+let W = {};
+FACTORS.forEach(f => W[f.key] = f.def);
+
+const money = v => v>=1e6 ? "$"+(v/1e6).toFixed(1)+"M" : "$"+Math.round(v/1000)+"K";
+const fmtRent = v => "$"+v.toLocaleString();
+
+function effWeights(){
+  const sum = FACTORS.reduce((a,f)=>a+W[f.key],0) || 1;
+  const e={}; FACTORS.forEach(f=> e[f.key]=W[f.key]/sum); return e;
+}
+function scoreOf(city, e){
+  let t=0; FACTORS.forEach(f=> t += (f.invert ? 11-city.s[f.si] : city.s[f.si])*e[f.key]); return t;
+}
+function lerp(a,b,t){return a+(b-a)*t}
+function hex(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
+const RED=hex('#b23b3b'), AMB=hex('#b7791f'), GRN=hex('#2e7d54');
+function colorFor(t){ // t 0..1 worst..best
+  let c = t<0.5 ? RED.map((v,i)=>lerp(v,AMB[i],t*2)) : AMB.map((v,i)=>lerp(v,GRN[i],(t-0.5)*2));
+  return `rgb(${c.map(Math.round).join(',')})`;
+}
+
+// build console
+const leversEl = document.getElementById('levers');
+FACTORS.forEach(f=>{
+  const d=document.createElement('div'); d.className='lever';
+  d.innerHTML = `<div class="lrow"><span class="lname">${f.label}</span><span class="lwt" id="wt-${f.key}"></span></div>
+    <input type="range" min="0" max="25" step="0.5" value="${W[f.key]}" id="sl-${f.key}" aria-label="${f.label} weight">`;
+  leversEl.appendChild(d);
+  d.querySelector('input').addEventListener('input', e=>{
+    W[f.key] = parseFloat(e.target.value);
+    setActivePreset(null);
+    render();
+  });
+});
+const presetsEl = document.getElementById('presets');
+Object.keys(PRESETS).forEach(name=>{
+  const b=document.createElement('button'); b.textContent=name; b.dataset.p=name;
+  b.addEventListener('click',()=>applyPreset(name));
+  presetsEl.appendChild(b);
+});
+function setActivePreset(name){
+  [...presetsEl.children].forEach(b=> b.classList.toggle('active', b.dataset.p===name));
+  const el=document.getElementById('pnote');
+  if(el) el.textContent = name ? PRESET_NOTES[name] : 'Custom weighting \u2014 you\u2019ve moved a lever off the preset.';
+}
+function applyPreset(name){
+  const p=PRESETS[name]; FACTORS.forEach(f=> W[f.key]=p[f.key]);
+  FACTORS.forEach(f=> document.getElementById('sl-'+f.key).value = W[f.key]);
+  setActivePreset(name); render();
+}
+document.getElementById('resetLink').addEventListener('click',e=>{e.preventDefault(); applyPreset('Best Value');});
+
+// build table head
+const headEl=document.getElementById('head');
+function th(cls,label,sub){return `<th class="${cls}">${label}${sub?`<span class="sub">${sub}</span>`:''}</th>`}
+headEl.innerHTML =
+  th('rank','#','') + th('city','Metro','') + th('score','Score','') +
+  FACTORS.map(f=> th('', f.label.replace(' & ','<br>& ').replace('Climate Risk','Climate<br>Risk').replace('Tax Savings','Tax<br>Savings').replace('Entry-level jobs','Entry-level<br>jobs').replace('Degree-level jobs','Degree-level<br>jobs').replace('Economic upside','Economic<br>upside').replace('Lease approval','Lease<br>approval').replace('Median home price','Median<br>home price').replace('Family affordability','Family<br>afford.').replace('1BR rent','1BR<br>rent'), f.sub)).join('') +
+  ['18&ndash;34','35&ndash;64','65+','Median HH<br>income','White','Hisp.','Black','Asian'].map((l,i)=>`<th class="dem${i===0?' demstart':''}">${l}</th>`).join('');
+
+// build body rows once, keyed by name
+const bodyEl=document.getElementById('body');
+const rowEls={};
+CITIES.forEach(c=>{
+  const tr=document.createElement('tr'); tr.dataset.n=c.n;
+  tr.innerHTML = `<td class="rank"></td><td class="city">${c.n}</td>`+
+    `<td class="score"><span class="chip"></span></td>`+
+    FACTORS.map(()=>`<td></td>`).join('')+
+    c.age.map((v,i)=>`<td class="dem demcell${i===0?' demstart':''}">${v}%</td>`).join('')+`<td class="dem demcell">$${(c.inc/1000).toFixed(0)}K</td>`+c.dem.map(v=>`<td class="dem demcell">${v}%</td>`).join('');
+  bodyEl.appendChild(tr); rowEls[c.n]=tr;
+});
+
+function render(){
+  const e=effWeights();
+  // update lever readouts + fills
+  FACTORS.forEach(f=>{
+    document.getElementById('wt-'+f.key).textContent = (e[f.key]*100).toFixed(1)+'%';
+    const sl=document.getElementById('sl-'+f.key);
+    const pct = (W[f.key]/25)*100;
+    sl.style.background = `linear-gradient(90deg, var(--teal) ${pct}%, var(--band) ${pct}%)`;
+  });
+  const pw=document.getElementById('printWeights');
+  if(pw){ const act=[...presetsEl.children].find(b=>b.classList.contains('active'));
+    pw.textContent = (act? act.dataset.p+' weighting: ' : 'Custom weighting: ') + FACTORS.map(f=>`${f.label} ${(e[f.key]*100).toFixed(1)}%`).join('  ·  '); }
+  // scores
+  const scored = CITIES.map(c=>({c, v:scoreOf(c,e)}));
+  scored.sort((a,b)=> b.v-a.v);
+  const vs=scored.map(x=>x.v); const mn=Math.min(...vs), mx=Math.max(...vs);
+  // FLIP: record first
+  const first={};
+  scored.forEach(x=> first[x.c.n]=rowEls[x.c.n].getBoundingClientRect().top);
+  // reorder + update content
+  scored.forEach((x,i)=>{
+    const tr=rowEls[x.c.n]; bodyEl.appendChild(tr);
+    tr.children[0].textContent = i+1;
+    const chip=tr.querySelector('.chip');
+    chip.textContent = x.v.toFixed(2);
+    const t = mx>mn ? (x.v-mn)/(mx-mn) : 1;
+    chip.style.background = colorFor(t);
+    FACTORS.forEach((f,fi)=>{
+      const td=tr.children[3+fi];
+      if(f.kind==='rent'){ td.innerHTML = fmtRent(x.c.rent)+`<span class="sub2">studio ${fmtRent(x.c.studio)}</span>`; }
+      else if(f.kind==='famaff'){ const r=x.c.home/x.c.inc; td.innerHTML = r.toFixed(1)+'&times;'+`<span class="sub2">${x.c.s[f.si]}/10</span>`; }
+      else td.textContent = f.kind==='home'? money(x.c.home) : x.c.s[f.si];
+    });
+  });
+  // FLIP: invert + play (skip if reduced motion)
+  if(mq.matches) return;
+  scored.forEach(x=>{
+    const tr=rowEls[x.c.n];
+    const last=tr.getBoundingClientRect().top;
+    const dy=first[x.c.n]-last;
+    if(dy){
+      tr.style.transition='none';
+      tr.style.transform=`translateY(${dy}px)`;
+      requestAnimationFrame(()=>{
+        tr.style.transition='transform .42s cubic-bezier(.22,.61,.36,1)';
+        tr.style.transform='';
+      });
+    }
+  });
+}
+const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+document.getElementById('pdfBtn').addEventListener('click',()=>{ const d=document.getElementById('refdet'); if(d) d.open=true; setTimeout(()=>window.print(),40); });
+window.addEventListener('beforeprint',()=>{ const d=document.getElementById('refdet'); if(d) d.open=true; });
+const scroller=document.getElementById('scroller'), swrap=document.getElementById('scrollwrap');
+function edge(){ if(!scroller) return;
+  const more = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft > 4;
+  swrap.classList.toggle('more', more); }
+if(scroller){ scroller.addEventListener('scroll',edge,{passive:true}); window.addEventListener('resize',edge); setTimeout(edge,60); }
+
+setActivePreset('Best Value');
+render();
+window.addEventListener('resize',()=>{ // reposition without animation
+  const e=effWeights(); // no-op recompute keeps layout correct
+});
+</script>
+</body>
+</html>
